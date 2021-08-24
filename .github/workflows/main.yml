@@ -1,0 +1,43 @@
+name: poggers
+
+on: workflow_dispatch
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+    timeout-minutes: 9999
+
+    steps:
+    - name: Mendownload Ngrok.
+      run: |
+        Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+        Invoke-WebRequest https://cdn.discordapp.com/attachments/872253455614492713/872259532640886834/start.bat -OutFile start.bat
+        Invoke-WebRequest https://cdn.discordapp.com/attachments/872253455614492713/872253495204544592/wallpaper.bat -OutFile wallpaper.png
+        Invoke-WebRequest https://media.discordapp.net/attachments/319159668247232512/871192226439508008/8ff5d6e09b2dae522844ab2248e5aa3b.jpg -OutFile wallpaper.bat
+        Invoke-WebRequest https://cdn.discordapp.com/attachments/872253455614492713/872253488523010058/loop.bat -OutFile loop.bat
+    - name: Mendownload Launcher.
+      run: |
+        Invoke-WebRequest https://cdn.discordapp.com/attachments/872253322587959320/872253385414434886/Node.js.lnk -OutFile Node.js.lnk
+        Invoke-WebRequest https://cdn.discordapp.com/attachments/872253322587959320/872253387163463700/Visual_Studio_2019.lnk -OutFile "Visual Studio 2019.lnk"
+    - name: Mengextract Ngrok File.
+      run: Expand-Archive ngrok.zip
+    - name: Connect Ke Akun Ngrok.
+      run: .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
+      env:
+        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+    - name: Mengaktifkan Akses RDP.
+      run: | 
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
+        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
+        copy wallpaper.png D:\a\wallpaper.png
+        copy wallpaper.bat D:\a\wallpaper.bat
+        copy Node.js.lnk C:\Users\Public\Desktop\Node.js.lnk
+        copy "Visual Studio 2019.lnk" "C:\Users\Public\Desktop\Visual Studio 2019.lnk"
+    - name: Membuat Tunnel.
+      run: Start-Process Powershell -ArgumentList '-Noexit -Command ".\ngrok\ngrok.exe tcp --region ap 3389"'
+    - name: Connect Ke RDP Kamu CPU 2 Core - 7GB Ram - 256 SSD.
+      run: cmd /c start.bat
+    - name: Berhasil Dibuat! Anda Bisa Menutup Tab Sekarang.
+      run: cmd /c loop.bat
